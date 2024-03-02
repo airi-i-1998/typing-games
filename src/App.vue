@@ -5,8 +5,10 @@ import Typing from './components/Typing.vue';
 </script>
 
 <template>
-  <Timer />
-  <Typing />
+  <body>
+    <Timer />
+    <Typing />
+  </body>
 </template>
 
 <style scoped>

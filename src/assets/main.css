@@ -1,0 +1,16 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  /* 画面の高さに依存する */
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* 左トップからグラデーション */
+  background: linear-gradient(to left top,#1bf0bb,#c0d81e);
+  /* 文字のスタイルや形状のセットを指定 */
+  font-family: "Poppins",sans-serif;
+}
