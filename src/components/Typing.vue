@@ -1,6 +1,40 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const RANDOM_SENTENCE_URL_API = "https://api.quotable.io/random";
+
+onMounted(() => {
+  const typeDisplay = document.getElementById("typeDisplay");
+  console.log(document.getElementById("typeDisplay"));
+});
+
+/* 非同期でランダムな文章を取得　*/
+// データをAPIで取得する際は、データ取得までに時間がかかるため、非同期処理で行う！
+function getRandomSentence(){
+
+  // fetch関数：Web APIかつHTTPリクエストを行うための機能を提供。また、非同期処理を行う関数→fetch自体がPromiseオブジェクトを返す。
+  return fetch(RANDOM_SENTENCE_URL_API)
+
+  // then.()：Promiseパターンにおいて非同期操作が完了した後に実行されるコールバック関数を指定するメソッド。
+  .then((response) => response.json())
+  .then((data) => data.content);
+}
+
+/* ランダムな文章を取得して表示する　*/
+// 非同期処理のデータを取得する際　async ~ await
+async function renderNextSentence(){
+  const sentence = await getRandomSentence();
+  typeDisplay.innerText = sentence;
+}
+
+renderNextSentence();
+
+
+</script>
+
 <template>
   <div class="container">
-    <div class="type-display" id="typeDisplay">type</div>
+    <div class="type-display" id="typeDisplay"></div>
     <textarea class="type-input" autofocus id="typeInput">type</textarea>
   </div>
 </template>
