@@ -6,21 +6,32 @@ const RANDOM_SENTENCE_URL_API = "https://api.quotable.io/random";
 onMounted(() => {
   const typeDisplay = document.getElementById("typeDisplay");
   const typeInput = document.getElementById("typeInput");
+  const timer = document.getElementById("timer");
+
+  const typeSound = new Audio("/audio/typing-sound.mp3");
+  const correctSound = new Audio("/audio/correct.mp3");
+  const incorrectSound = new Audio("/audio/incorrect.mp3");
   /* 入力されたテキストが表示テキストと一致しているのか判定 */
 
   // typeInputにイベントを追加、入力されるinput要素を監視
   typeInput.addEventListener("input", () => {
+    /* タイプ音をつける */
+    // playメソッド：音声を再生
+    typeSound.play();
+    // currentTimeプロパティ：音声の再生位置を制御するためのもの。0に設定することで音声の再生位置を再生の最初に戻す。
+    typeSound.currentTime = 0;
     //sentenceArray変数：typeDisplay内のすべての<span>要素を取得
     const sentenceArray = typeDisplay.querySelectorAll("span");
     // 入力されたテキストを1文字ずつ取得
     const arrayValue = typeInput.value.split("");
-
+    let correct = true;
     // characterSpan：<span> 要素そのもの
-      // character.innerText：<span> 要素内のテキストコンテンツを取得
+    // character.innerText：<span> 要素内のテキストコンテンツを取得
     sentenceArray.forEach((characterSpan, index) => {
       if (arrayValue[index] == null) {
         characterSpan.classList.remove("correct");
         characterSpan.classList.remove("incorrect");
+        correct = false;
         // characterSpanのテキストがarrayValue配列の[index]番目の要素と等しいかどうかを比較
       } else if (characterSpan.innerText == arrayValue[index]) {
         characterSpan.classList.add("correct");
@@ -28,8 +39,17 @@ onMounted(() => {
       } else {
         characterSpan.classList.add("incorrect");
         characterSpan.classList.remove("correct");
+        incorrectSound.volume = 0.3;
+        incorrectSound.play();
+        incorrectSound.currentTime = 0;
+        correct = false;
       }
     });
+    if (correct == true) {
+      correctSound.play();
+      correctSound.currentTime = 0;
+      renderNextSentence();
+    }
   });
 });
 
@@ -66,13 +86,39 @@ async function renderNextSentence() {
   });
 
   // テキストとボックスの中身を消す
-  typeInput.innerText = "";
+  typeInput.value = "";
+
+  StartTimer();
+}
+
+let startTime;
+let originTime = 30;
+
+function StartTimer() {
+  timer.innerText = originTime;
+  // タイマーがスタートする瞬間の現在時刻を取得
+  startTime = new Date();
+  // setIntervalメソッド：定期的なタスクや関数を繰り返し実行する
+  setInterval(() => {
+    timer.innerText = originTime - getTimerTime();
+    if (timer.innerText <= 0) timeUp();
+  }, 1000);
+}
+
+function getTimerTime() {
+  // 現在時間 - 設定されたタイマーがスタートした時点までの経過時間
+  return Math.floor((new Date() - startTime) / 1000);
+}
+
+function timeUp() {
+  renderNextSentence();
 }
 
 renderNextSentence();
 </script>
 
 <template>
+  <div class="timer" id="timer">0</div>
   <div class="container">
     <div class="type-display" id="typeDisplay"></div>
     <textarea class="type-input" autofocus id="typeInput"></textarea>
@@ -93,6 +139,13 @@ renderNextSentence();
   min-height: 600px;
   max-width: 90%;
   box-shadow: 1px 5px 6px rgb(80, 80, 80);
+}
+
+.timer {
+  position: absolute;
+  top: 2rem;
+  font-size: 5rem;
+  font-weight: bold;
 }
 
 .container,
